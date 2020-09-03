@@ -70,25 +70,17 @@ def arrange_image(im_input):
     im_input = np.reshape(im_input, [b * t, ch, h, w])
     return im_input
 
-
-if args.dataset_type == "Avenue":
-    train_folder = args.dataset_path + args.dataset_type + '/frames/' + args.dataset_augment_type + '/'
-    test_folder = args.dataset_path + args.dataset_type + '/frames/' + args.dataset_augment_test_type + '/'
-elif args.dataset_type == "UCSDped2" or args.dataset_type == "UCSDped1":
-    train_folder = args.dataset_path + args.dataset_type + "/Train_jpg/"
-    test_folder = args.dataset_path + args.dataset_type + "/Test_jpg/"
+train_folder, test_folder = data_utils.give_data_folder(args.dataset_type, 
+                                                        args.dataset_path, 
+                                                        args.dataset_augment_type, 
+                                                        args.dataset_augment_test_type)
 
 print("The training path", train_folder)
 print("The testing path", test_folder)
 
-# Loading dataset
 
-frame_trans = transforms.Compose([
-        transforms.Resize([args.h, args.w]),
-        transforms.Grayscale(num_output_channels=1),
-        transforms.ToTensor(),
-        transforms.Normalize([0.5], [0.5]),
-    ])
+frame_trans = data_utils.give_frame_trans(args.dataset_type, [args.h, args.w])
+
 
 train_dataset = data_utils.DataLoader(train_folder, frame_trans, time_step=args.t_length - 1, num_pred=1)
 test_dataset = data_utils.DataLoader(test_folder, frame_trans, time_step=args.t_length - 1, num_pred=1)
@@ -132,6 +124,9 @@ if not os.path.exists(log_dir):
 orig_stdout = sys.stdout
 f = open(os.path.join(log_dir, 'log.txt'),'w')
 sys.stdout= f
+
+for arg in vars(args):
+    print(arg, getattr(args, arg))
 
 train_writer = SummaryWriter(log_dir=log_dir)
 
@@ -208,6 +203,7 @@ for epoch in range(args.epochs):
 
 sys.stdout = orig_stdout
 f.close()
+
 
 
 

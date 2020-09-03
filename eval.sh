@@ -1,8 +1,10 @@
 #!/bin/bash
-python Testing.py --dataset UCSDped2 --augment_type original --version 1 --lr 1e-4 --EntropyLossWeight 5e-5 --ckpt_step 30
+trap "exit" INT
+version=${1?Error: experiment version is not defined}
+ckpt_step=${2?Error: ckpt step is not defined}
+python Testing.py --dataset_type Avenue --dataset_path /tmp/bo/ --dataset_augment_test_type frames/testing/ --version $version --EntropyLossWeight 0 --lr 1e-4 --exp_dir /project/bo/exp_data/memory_normal/ --ckpt_step $ckpt_step
 
 
-# python Train.py --dataset_path /project_scratch/bo/anomaly_data/ --dataset_type UCSDped2 --dataset_augment_type original --exp_dir /project/bo/exp_data/memory_normal/ --version 1 --EntropyLossWeight 0.00005 --lr 1e-4 
 
 
 

@@ -1,7 +1,7 @@
 import torch 
 from torch import nn
-import summary
 import os
+import sys
 import numpy as np
 import time
 from torchvision import transforms
@@ -14,30 +14,51 @@ from tqdm import tqdm
 import utils.eval as eval_utils
 
 parser = argparse.ArgumentParser(description="Memorizing_Normality")
-parser.add_argument('--dataset', type=str, default="UCSDped2")
-parser.add_argument("--augment_type", type=str, default="original")
+parser.add_argument('--dataset_type', type=str, default="UCSDped2")
+parser.add_argument("--dataset_path", type=str, default='/project/bo/anomaly_data/')
+parser.add_argument('--dataset_augment_type', type=str, default="training", help='the augmented version or not augmented version')
+parser.add_argument('--dataset_augment_test_type', type=str, default='frames/testing/', help='the augmented version')
 parser.add_argument("--version", type=int, default=1)
 parser.add_argument("--ckpt_step", type=int, default=59)
-parser.add_argument("--EntropyLossWeight", type=float, default=2e-4)
+parser.add_argument("--EntropyLossWeight", type=float, default=0)
 parser.add_argument("--lr", type=float, default=1e-4)
+parser.add_argument("--exp_dir", type=str, default='/project/bo/exp_data/memory_normal/')
 args = parser.parse_args()
 
 device = "cuda"
-
 height, width = 256, 256
 ch = 1
 num_frame = 16
 batch_size=1
 ModelName = "MemAE"
-model_dir = '/project/bo/exp_data/memory_normal/%s/%slr_%.5f_entropyloss_%.5f_version_%d/' % (args.dataset, 
-                                                                                              args.augment_type,
-                                                                                              args.lr,
-                                                                                              args.EntropyLossWeight,
-                                                                                              args.version)
+model_dir = args.exp_dir + '%s/%slr_%.5f_entropyloss_%.5f_version_%d/' % (args.dataset_type, args.dataset_augment_type,
+                                                                            args.lr, args.EntropyLossWeight, args.version)
+
+orig_stdout = sys.stdout
+if args.dataset_augment_test_type == "frames/testing/":
+    first = "original_1.00"
+else:
+    first = args.dataset_augment_test_type
+f = open(os.path.join(model_dir, 'output_%s_%d.txt' % (first, args.ckpt_step)),'w')
+sys.stdout= f
 
 ckpt_dir = model_dir + "model-00%d.pt" % args.ckpt_step
 
-data_dir = '/project/bo/anomaly_data/%s/%s/' % (args.dataset, "Test_jpg")
+if "venue" in args.dataset_type:
+    args.dataset_type = "Avenue"
+    
+gt_file = args.dataset_path + "%s/gt_label.npy" % args.dataset_type
+if args.dataset_augment_test_type == "frames/testing/":
+    save_path = model_dir + "recons_error_original_1.0.npy"
+else:
+    save_path = model_dir + "recons_error_%s.npy" % args.dataset_augment_test_type
+    
+if os.path.isfile(save_path):
+    recons_error = np.load(save_path)
+    eval_utils.eval_video2(gt_file, recons_error, args.dataset_type)
+    exit()
+    
+data_dir = args.dataset_path + '/%s/%s/' % (args.dataset_type, args.dataset_augment_test_type)
 
 frame_trans = transforms.Compose([
         transforms.Resize([height, width]),
@@ -46,6 +67,7 @@ frame_trans = transforms.Compose([
         transforms.Normalize([0.5], [0.5]),
     ])
 unorm_trans = utils.UnNormalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+
 print("------Data folder", data_dir)
 print("------Model folder", model_dir)
 print("------Restored ckpt", ckpt_dir)
@@ -66,6 +88,7 @@ model.eval()
 
 img_crop_size = 0
 recon_error_list = [None] * len(video_data_loader)
+# recon_error_list = []
 progress_bar = tqdm(video_data_loader)
 for batch_idx, frames in enumerate(progress_bar):
     progress_bar.update()
@@ -91,10 +114,22 @@ for batch_idx, frames in enumerate(progress_bar):
     else:
         recon_error = -1
         print('Wrong ModelName.')
+#     recon_error_list.append(recon_error)
     recon_error_list[batch_idx] = recon_error
 
-gt_file = "/project/bo/anomaly_data/%s/gt.npy" % args.dataset
+# recon_error_list = [v for j in recon_error_list for v in j]
+print("The length of the reconstruction error is ", len(recon_error_list))
+print("The length of the testing images is", len(data_loader))
 print("............start to checking the anomaly detection auc score...................")
-eval_utils.eval_video2(gt_file, recon_error_list, args.dataset)
-# np.save(model_dir + 'recons_error_%s' % args.augment_type, recon_error_list)
+print("............use ckpt dir at step %d" % args.ckpt_step)
+eval_utils.eval_video2(gt_file, recon_error_list, args.dataset_type)
+sys.stdout = orig_stdout
+f.close()
+
+save_path = model_dir + "recons_error_original_1.0"
+np.save(save_path, recon_error_list)
+
+
+
+
 

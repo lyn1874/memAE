@@ -33,7 +33,6 @@ def eval_video2(gt_file, score_path, data):
     print("AUC score on data %s is %.2f" % (data, auc))
 
 
-
 def eval_video(data_path, res_path, is_show=False):
     gt_path = os.path.join(data_path, 'testing_gt/')
 
