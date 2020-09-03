@@ -19,9 +19,16 @@ Majority of the code are based on the original repo https://github.com/donggong1
 
 #### Prepare dataset
 
-The dataloader, transformation and other related functions are in the file data/utils.py
+The dataloader, transformation and other related functions are in the file `data/utils.py`. Depend on your own data structure, you probably need to manually edit the function `setup` in the file `data/utils.py`
 
-In my case, the data is arranged as ../Avenue/frames/training/training_video_10_frame_10.jpg, training_video_10 is the video string name and frame_10.jpg is the frame index in this video. Depend on your own data structure, you probably need to manually edit the function *setup* 
+In my case, the data is arranged as:
+
+../Avenue/frames/training/training_video_X_frame_Y.jpg, 
+
+../Avenue/frames/testing/testing_video_X_frame_Y.jpg
+
+- X is the video index
+- Y is the frame index in per video
 
 #### Train the model
 
