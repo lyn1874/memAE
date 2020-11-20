@@ -1,8 +1,11 @@
 #!/bin/bash
 trap "exit" INT
-version=${1?Error: experiment version is not defined}
-ckpt_step=${2?Error: ckpt step is not defined}
-python Testing.py --dataset_type Avenue --dataset_path /tmp/bo/ --dataset_augment_test_type frames/testing/ --version $version --EntropyLossWeight 0 --lr 1e-4 --exp_dir /project/bo/exp_data/memory_normal/ --ckpt_step $ckpt_step
+datatype=${1?Error: which data am I testing? Avenue, UCSDped2}
+datapath=${2?Error: where are the dataset?}
+version=${3?Error: experiment version is not defined}
+ckpt_step=${4?Error: ckpt step is not defined}
+exp_dir=${5?Error: where are the ckpt}
+python Testing.py --dataset_type $datatype --dataset_path $datapath --version $version --EntropyLossWeight 0 --lr 1e-4 --exp_dir $exp_dir --ckpt_step $ckpt_step
 
 
 

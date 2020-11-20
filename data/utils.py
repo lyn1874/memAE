@@ -109,38 +109,24 @@ def setup(path, videos):
 
 def give_frame_trans(dataset_type, imshape):
     height, width = imshape
-    if dataset_type == "Avenue_bright":
-        print("---Need to random adjust the brightness from 0.2 to 1.8---")
-        frame_trans = transforms.Compose([
-            transforms.Resize([height, width]),
-            transforms.ColorJitter(brightness=(0.2, 1.8), contrast=0, saturation=0, hue=0),
-            transforms.Grayscale(num_output_channels=1),
-            transforms.ToTensor(),
-            transforms.Normalize([0.5], [0.5]),
-        ])
-    else:
-        print("--There is no other augmentation except resizing, grayscale and normalization--")
-        frame_trans = transforms.Compose([
-            transforms.Resize([height, width]),
-            transforms.Grayscale(num_output_channels=1),
-            transforms.ToTensor(),
-            transforms.Normalize([0.5], [0.5]),
-        ])
+    print("--There is no other augmentation except resizing, grayscale and normalization--")
+    frame_trans = transforms.Compose([transforms.Resize([height, width]),
+                                      transforms.Grayscale(num_output_channels=1),
+                                      transforms.ToTensor(),
+                                      transforms.Normalize([0.5], [0.5])])
     return frame_trans
 
 
-def give_data_folder(dataset_type, dataset_path, dataset_augment_type, dataset_augment_test_type):
+def give_data_folder(dataset_type, dataset_path):
     """Give the path that saves the Avenue dataset or UCSDPed dataset
     Args:
         dataset_path: the main folder, in my case it's /project_scratch/bo/anomaly_data/
         dataset_type: Avenue/UCSDped2/UCSDped1/
-        dataset_augment_type: training
-        dataset_augment_test_type: testing
     User defined!
     """
     if dataset_type == "Avenue":
-        train_folder = dataset_path + dataset_type + '/frames/' + dataset_augment_type + '/'
-        test_folder = dataset_path + dataset_type + '/frames/' + dataset_augment_test_type + '/'
+        train_folder = dataset_path + dataset_type + '/frames/training/'
+        test_folder = dataset_path + dataset_type + '/frames/testing/'
 
     elif dataset_type == "UCSDped2" or dataset_type == "UCSDped1":
         train_folder = dataset_path + dataset_type + "/Train_jpg/"

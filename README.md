@@ -15,33 +15,37 @@ Majority of the code are based on the original repo https://github.com/donggong1
 
 - Python==3.7.6
 
-- ./requirement.sh
+- `./requirement.sh`
 
 #### Prepare dataset
 
-The dataloader, transformation and other related functions are in the file `data/utils.py`. Depend on your own data structure, you probably need to manually edit the function `setup` in the file `data/utils.py`
-
-In my case, the data is arranged as:
-
-../Avenue/frames/training/training_video_X_frame_Y.jpg, 
-
-../Avenue/frames/testing/testing_video_X_frame_Y.jpg
-
-- X is the video index
-- Y is the frame index in per video
+```pyth
+prepare_data.sh dataset datapath
+dataset: Avenue, UCSDped2
+datapath: the path that you want to save the data, i.e., /project/anomaly_data/
+```
 
 #### Train the model
 
-```python
-./run.sh
+```pyth
+./run.sh dataset datapath expdir
+dataset: Avenue, UCSDped2 
+datapath: the path that you want to save the data, i.e., /project/anomaly_data/
+expdir: the path that you want to save the checkpoint
 ```
 
 #### Evaluate the model
 
 ```pyth
-./eval.sh 0 50
-The first value is the experiment version and second value is the model ckpt step
+./eval.sh dataset, datapath, version, ckpt, expdir
+dataset: Avenue, UCSDped2
+datapath: the path that you saved the data
+version: experiment version
+ckpt: the checkpoint step
+expdir: the path that you saved the model checkpoint
 ```
+If your Avenue dataset is saved under `/project/anomaly_data/Avenue/frames/testing/....`, run
+`./eval.sh Avenue /project/anomaly_data/ 0 40 ckpt/` to get the reported performance
 
 
 

@@ -16,8 +16,6 @@ import utils.eval as eval_utils
 parser = argparse.ArgumentParser(description="Memorizing_Normality")
 parser.add_argument('--dataset_type', type=str, default="UCSDped2")
 parser.add_argument("--dataset_path", type=str, default='/project/bo/anomaly_data/')
-parser.add_argument('--dataset_augment_type', type=str, default="training", help='the augmented version or not augmented version')
-parser.add_argument('--dataset_augment_test_type', type=str, default='frames/testing/', help='the augmented version')
 parser.add_argument("--version", type=int, default=1)
 parser.add_argument("--ckpt_step", type=int, default=59)
 parser.add_argument("--EntropyLossWeight", type=float, default=0)
@@ -31,35 +29,37 @@ ch = 1
 num_frame = 16
 batch_size=1
 ModelName = "MemAE"
-model_dir = args.exp_dir + '%s/%slr_%.5f_entropyloss_%.5f_version_%d/' % (args.dataset_type, args.dataset_augment_type,
-                                                                            args.lr, args.EntropyLossWeight, args.version)
-
-orig_stdout = sys.stdout
-if args.dataset_augment_test_type == "frames/testing/":
-    first = "original_1.00"
+if args.exp_dir == "ckpt/":
+    model_dir = "ckpt/"
 else:
-    first = args.dataset_augment_test_type
-f = open(os.path.join(model_dir, 'output_%s_%d.txt' % (first, args.ckpt_step)),'w')
+    model_dir = args.exp_dir + '%s/lr_%.5f_entropyloss_%.5f_version_%d/' % (args.dataset_type,
+                                                                            args.lr, 
+                                                                            args.EntropyLossWeight, args.version)
+model_dir="ckpt/"
+orig_stdout = sys.stdout
+f = open(os.path.join(model_dir, 'output_%s_%d.txt' % ("original_1.00", args.ckpt_step)),'w')
 sys.stdout= f
 
 ckpt_dir = model_dir + "model-00%d.pt" % args.ckpt_step
 
-if "venue" in args.dataset_type:
-    args.dataset_type = "Avenue"
     
-gt_file = args.dataset_path + "%s/gt_label.npy" % args.dataset_type
-if args.dataset_augment_test_type == "frames/testing/":
-    save_path = model_dir + "recons_error_original_1.0.npy"
-else:
-    save_path = model_dir + "recons_error_%s.npy" % args.dataset_augment_test_type
+gt_file = "ckpt/%s_gt.npy" % (args.dataset_type)
+# gt_file = args.dataset_path + "%s/gt_label.npy" % args.dataset_type
+save_path = model_dir + "recons_error_original_1.0.npy"
     
 if os.path.isfile(save_path):
     recons_error = np.load(save_path)
     eval_utils.eval_video2(gt_file, recons_error, args.dataset_type)
     exit()
     
-data_dir = args.dataset_path + '/%s/%s/' % (args.dataset_type, args.dataset_augment_test_type)
-
+if args.dataset_type == "Avenue":
+    data_dir = args.dataset_path + "Avenue/frames/testing/"
+elif "UCSD" in args.dataset_type:
+    data_dir = args.dataset_path + "%s/Test_jpg/" % args.dataset_type
+else:
+    print("The dataset is not available..........")
+    pass
+    
 frame_trans = transforms.Compose([
         transforms.Resize([height, width]),
         transforms.Grayscale(num_output_channels=1),

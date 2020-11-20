@@ -53,8 +53,6 @@ parser.add_argument('--num_workers', type=int, default=4, help='number of worker
 parser.add_argument('--num_workers_test', type=int, default=1, help='number of workers for the test loader')
 parser.add_argument('--dataset_type', type=str, default='ped2', help='type of dataset: ped2, avenue, shanghai')
 parser.add_argument('--dataset_path', type=str, default='./dataset/', help='directory of data')
-parser.add_argument('--dataset_augment_type', type=str, default="training", help='the augmented version or not augmented version')
-parser.add_argument('--dataset_augment_test_type', type=str, default='original_testing', help='the augmented version')
 parser.add_argument('--exp_dir', type=str, default='log', help='directory of log')
 parser.add_argument('--version', type=int, default=0, help='experiment version')
 
@@ -71,9 +69,7 @@ def arrange_image(im_input):
     return im_input
 
 train_folder, test_folder = data_utils.give_data_folder(args.dataset_type, 
-                                                        args.dataset_path, 
-                                                        args.dataset_augment_type, 
-                                                        args.dataset_augment_test_type)
+                                                        args.dataset_path)
 
 print("The training path", train_folder)
 print("The testing path", test_folder)
@@ -117,7 +113,7 @@ scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[40], gamma=0.2
 #scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer,T_max =args.epochs)
 
 # Report the training process
-log_dir = os.path.join(args.exp_dir, args.dataset_type, args.dataset_augment_type + 'lr_%.5f_entropyloss_%.5f_version_%d' % (
+log_dir = os.path.join(args.exp_dir, args.dataset_type, 'lr_%.5f_entropyloss_%.5f_version_%d' % (
     args.lr, args.EntropyLossWeight, args.version))
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
