@@ -30,7 +30,7 @@ def eval_video2(gt_file, score_path, data):
     print("Number of predictions:", len(score_after))
     fpr, tpr, thresholds = skmetr.roc_curve(label_after, score_after, pos_label=2)
     auc = skmetr.auc(fpr, tpr)
-    print("AUC score on data %s is %.2f" % (data, auc))
+    print("AUC score on data %s is %.4f" % (data, auc))
 
 
 def eval_video(data_path, res_path, is_show=False):

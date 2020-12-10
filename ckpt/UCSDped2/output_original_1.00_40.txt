@@ -1,0 +1,12 @@
+------Data folder /project_scratch/bo/anomaly_play/UCSDped2/Test_jpg/
+------Model folder ckpt/UCSDped2/
+------Restored ckpt ckpt/UCSDped2/model-0040.pt
+['Test001', 'Test002', 'Test003', 'Test004', 'Test005', 'Test006', 'Test007', 'Test008', 'Test009', 'Test010', 'Test011', 'Test012']
+AutoEncoderCov3DMem
+The length of the reconstruction error is  1830
+The length of the testing images is 1830
+............start to checking the anomaly detection auc score...................
+............use ckpt dir at step 40
+Number of gt frames: 1830
+Number of predictions: 1830
+AUC score on data UCSDped2 is 0.9341

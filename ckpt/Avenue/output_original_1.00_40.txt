@@ -1,0 +1,3 @@
+Number of gt frames: 15009
+Number of predictions: 15009
+AUC score on data Avenue is 0.8099

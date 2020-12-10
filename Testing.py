@@ -29,13 +29,13 @@ ch = 1
 num_frame = 16
 batch_size=1
 ModelName = "MemAE"
-if args.exp_dir == "ckpt/":
-    model_dir = "ckpt/"
+if "ckpt/" in args.exp_dir:
+    model_dir = "ckpt/%s/" % args.dataset_type
 else:
     model_dir = args.exp_dir + '%s/lr_%.5f_entropyloss_%.5f_version_%d/' % (args.dataset_type,
                                                                             args.lr, 
                                                                             args.EntropyLossWeight, args.version)
-model_dir="ckpt/"
+
 orig_stdout = sys.stdout
 f = open(os.path.join(model_dir, 'output_%s_%d.txt' % ("original_1.00", args.ckpt_step)),'w')
 sys.stdout= f
@@ -45,7 +45,7 @@ ckpt_dir = model_dir + "model-00%d.pt" % args.ckpt_step
     
 gt_file = "ckpt/%s_gt.npy" % (args.dataset_type)
 # gt_file = args.dataset_path + "%s/gt_label.npy" % args.dataset_type
-save_path = model_dir + "recons_error_original_1.0.npy"
+save_path = model_dir + "recons_error_original_1.0_%d.npy" % args.ckpt_step
     
 if os.path.isfile(save_path):
     recons_error = np.load(save_path)
@@ -126,7 +126,7 @@ eval_utils.eval_video2(gt_file, recon_error_list, args.dataset_type)
 sys.stdout = orig_stdout
 f.close()
 
-save_path = model_dir + "recons_error_original_1.0"
+save_path = model_dir + "recons_error_original_1.0_%d" % args.ckpt_step
 np.save(save_path, recon_error_list)
 
 

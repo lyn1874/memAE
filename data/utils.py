@@ -90,7 +90,7 @@ def setup(path, videos):
     elif "UCSDped" in path:
         video_string = np.unique([v.strip().split('_')[0] for v in os.listdir(path)])
         video_string = sorted(video_string)
-        all_video_frames = np.array([v for v in os.listdir(path) if '.jpg' in v])
+        all_video_frames = np.array([path+v for v in os.listdir(path) if '.jpg' in v])
     print(video_string)
     if "veneu" in path:
         path = path.strip().split('frames/')[0] + 'frames/'
